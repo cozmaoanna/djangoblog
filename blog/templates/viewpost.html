@@ -15,7 +15,7 @@
             <div class="row">
                 <div class="col-xs-9">
                     {% if post.image %}
-                        <img src="#">
+                        <img src="{{ MEDIA_URL }}{{ post.image }}" style="height=50px, width=33.188px" >
                     {% endif %}
                     <p>{{ post.content }}</p>
                    
