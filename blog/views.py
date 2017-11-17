@@ -6,7 +6,7 @@ from django.utils import timezone
 # Create your views here.
 # Create your views here.
 def blogposts(request):
-    posts=Post.objects.all()
+    posts=Post.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
     return render(request, 'blogposts.html', {'posts': posts})
     
 def viewpost(request, id):
@@ -22,6 +22,7 @@ def newpost(request):
             post = form.save(commit=False)
             post.author = request.user
             post.created_date = timezone.now()
+            post.published_date = timezone.now()
             post.save()
             return redirect (viewpost, post.pk)
     else:
