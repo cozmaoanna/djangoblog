@@ -21,7 +21,6 @@ from blog import urls as blog_urls
 from .settings import MEDIA_ROOT
 from django.views import static
 
-
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', blogposts, name="index"),

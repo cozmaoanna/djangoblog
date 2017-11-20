@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect 
-from .models import Post
-from .forms import BlogPostForm
+from .models import Post, Comment
+from .forms import BlogPostForm, BlogCommentForm
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 # Create your views here.
@@ -8,10 +8,14 @@ from django.utils import timezone
 def blogposts(request):
     posts=Post.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
     return render(request, 'blogposts.html', {'posts': posts})
-    
+   
+  
 def viewpost(request, id):
-    post=get_object_or_404(Post, pk=id)
-    return render(request, 'viewpost.html', {'post': post})
+    this_post = get_object_or_404(Post, pk=id)
+    comments = Comment.objects.filter(post=this_post)
+    form = BlogCommentForm()
+    return render(request, "viewpost.html", {'post': this_post, 'comments': comments, "form": form})
+
     
     
 @login_required()
@@ -43,3 +47,22 @@ def editpost(request, id):
     else:
         form = BlogPostForm(instance=post)
     return render(request, "postform.html", {'form': form})
+
+def deletepost(request, id):
+    post = get_object_or_404(Post, pk=id)
+    post.delete()
+    return redirect("home")
+    
+def addcomment(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    
+    form = BlogCommentForm(request.POST)
+    if form.is_valid():
+        comment = form.save(commit=False)
+        
+        comment.author = request.user 
+        comment.post = post
+        
+        comment.save()
+        return redirect("viewpost", post_id)
+    
